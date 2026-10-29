@@ -1,0 +1,113 @@
+/* 近未来(半透明ガラス+ネオン)テーマ。画面いっぱいに収まるレイアウト */
+:root{--c:#37e6ff;--g:rgba(12,24,48,.5);--b:rgba(55,230,255,.45);--vh:1vh}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+*,*::before,*::after{touch-action:manipulation}   /* ダブルタップ拡大を止める(タップ・スクロールは普通に使える) */
+html,body{height:100%}
+body{background:radial-gradient(#101a33,#04060d);color:#e8f6ff;font-family:system-ui,"Hiragino Sans",Meiryo,sans-serif;user-select:none;overflow:hidden}
+#app{height:100vh;height:100dvh;display:grid;grid-template-rows:minmax(0,1fr) auto;grid-template-columns:minmax(0,1fr)}
+#stage{position:relative;overflow:hidden;min-height:0;box-shadow:0 0 24px rgba(55,230,255,.25)}
+canvas{position:absolute;inset:0;width:100%;height:100%;display:block;background:#000}
+button{font:inherit;font-weight:600;font-size:clamp(14px,2.6vh,20px);color:#e8f6ff;background:var(--g);border:1px solid var(--b);border-radius:12px;padding:.6em .5em;cursor:pointer;
+ backdrop-filter:blur(8px);transition:.15s;box-shadow:inset 0 0 12px rgba(55,230,255,.12)}
+button:hover:not(:disabled){background:rgba(55,230,255,.3);border-color:#a8f6ff;box-shadow:0 0 18px rgba(55,230,255,.6);transform:translateY(-1px)}
+button:active:not(:disabled){transform:scale(.95);background:rgba(55,230,255,.55)}
+button:disabled{opacity:.25;cursor:default}
+.go{background:rgba(255,210,74,.22);border-color:rgba(255,210,74,.8);color:#ffe9a0}
+.go:hover:not(:disabled){background:rgba(255,210,74,.5);border-color:#ffe9a0;box-shadow:0 0 18px rgba(255,210,74,.7)}
+.m{font-size:clamp(13px,2.3vh,18px)}
+input,select{font:inherit;font-size:max(16px,clamp(15px,2.8vh,20px));color:#e8f6ff;background:rgba(12,24,48,.7);border:1px solid var(--b);border-radius:12px;padding:.6em .8em;width:min(320px,100%);text-align:center;outline:none}
+input:focus,select:focus{border-color:#a8f6ff;box-shadow:0 0 14px rgba(55,230,255,.6)}
+select option{background:#0b1630}
+.err{color:#ff8a9a;min-height:1.2em;font-size:14px}
+/* 上のバー: 画面の上に半透明の横棒を敷いて、その上に項目を並べる */
+#top{position:absolute;top:0;left:0;right:0;display:flex;flex-wrap:wrap;gap:4px 6px;align-items:center;padding:6px 8px;z-index:3;pointer-events:none;
+ background:linear-gradient(rgba(8,16,36,.78),rgba(8,16,36,.5));backdrop-filter:blur(8px);border-bottom:1px solid var(--b);box-shadow:0 2px 16px rgba(55,230,255,.18)}
+#top>*{pointer-events:auto}
+#bk,#rk{padding:4px 9px;font-size:clamp(11px,3.1vw,14px);width:auto;display:none;white-space:nowrap}
+#usr{flex:1;min-width:0;font-size:clamp(12px,2.2vh,15px);font-weight:600;color:#9ff4ff;text-shadow:0 0 8px rgba(55,230,255,.8);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;pointer-events:none}
+.chip{display:none;padding:2px 9px;border:1px solid rgba(55,230,255,.3);border-radius:999px;background:rgba(255,255,255,.07);font-weight:800;font-size:clamp(11px,3.1vw,15px);white-space:nowrap;text-shadow:0 0 8px rgba(55,230,255,.8);pointer-events:none}
+#md{color:#9ff4ff}
+#sv{margin-left:auto;color:#9ff4ff}
+#sc{color:#fff}
+#cb{color:#ffd24a;border-color:rgba(255,210,74,.8);text-shadow:0 0 10px rgba(255,180,0,.8)}
+#tgt{margin-right:auto;color:#ffd24a;border-color:rgba(255,210,74,.7);text-shadow:0 0 10px rgba(255,180,0,.8)}
+#lf{color:#ff6b8a;letter-spacing:1px;border-color:rgba(255,107,138,.5)}
+/* 視点の切り替え(右の操作ボタンと見分けがつくよう、灰色がかった別の色にしてある。いまの視点は白く光る) */
+#vb{display:none;align-items:center;border:1px solid rgba(255,255,255,.55);border-radius:999px;overflow:hidden;background:rgba(70,78,96,.85)}
+#vb .vl{font-size:clamp(9px,2.4vw,11px);color:#e4eaf6;padding:0 6px 0 9px}
+#vb button{border:0;border-radius:0;padding:3px 9px;font-size:clamp(11px,3vw,13px);background:transparent;box-shadow:none;color:#dfe6f4;backdrop-filter:none}
+#vb button.on{background:#f1f5ff;color:#16233f;text-shadow:none}
+#vb button:hover:not(:disabled){transform:none;box-shadow:none;background:rgba(255,255,255,.25)}
+#vb button.on:hover:not(:disabled){background:#f1f5ff}
+#clk{position:absolute;right:10px;bottom:8px;padding:4px 12px;font-size:14px;font-weight:600;border:1px solid var(--b);border-radius:999px;background:rgba(10,20,40,.5);backdrop-filter:blur(8px);pointer-events:none;z-index:1}
+#pops{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.pop{position:absolute;left:50%;top:42%;transform:translateX(-50%);font-size:clamp(24px,5vh,36px);font-weight:800;color:#ffd24a;text-shadow:0 0 12px #ffb300,0 2px 0 #000;animation:up 1.2s forwards;white-space:nowrap}
+@keyframes up{to{transform:translate(-50%,-90px);opacity:0}}
+#fl{position:absolute;inset:0;pointer-events:none;opacity:0}
+#to{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-8deg);display:none;font-size:clamp(24px,min(6vh,8vw),46px);font-weight:900;color:#ff4d6a;border:4px solid #ff4d6a;padding:.1em .35em;border-radius:12px;background:rgba(10,0,10,.8);text-shadow:0 0 18px #ff2040;white-space:nowrap;pointer-events:none;z-index:5;box-shadow:0 0 24px rgba(255,40,70,.6)}
+#to.bang{animation:bang .45s cubic-bezier(.2,1.6,.4,1) both}
+@keyframes bang{0%{transform:translate(-50%,-50%) rotate(-8deg) scale(3.2);opacity:0}60%{opacity:1}100%{transform:translate(-50%,-50%) rotate(-8deg) scale(1);opacity:1}}
+.shk{animation:sk .25s}@keyframes sk{25%{transform:translate(6px,-4px)}75%{transform:translate(-6px,4px)}}
+#cab{position:absolute;inset:0;pointer-events:none;display:none}#cab>div,#cab>svg{position:absolute}
+/* 画面(オーバーレイ) */
+#ov{position:absolute;inset:0;z-index:2;display:flex;overflow:auto;background:rgba(6,12,28,.82);backdrop-filter:blur(6px)}
+.ovin{margin:0 auto;width:100%;max-width:460px;min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(6px,1.6vh,12px);padding:50px 14px 14px;text-align:center}
+.ovin h1{font-size:clamp(22px,5.5vh,38px);line-height:1.3;letter-spacing:2px;color:#ffd24a;text-shadow:0 0 16px rgba(255,180,0,.7)}
+.ovin h2{font-size:clamp(18px,3.8vh,26px);color:#9ff4ff;text-shadow:0 0 12px rgba(55,230,255,.7)}
+.huge{font-size:clamp(28px,8vh,48px)!important}
+.sub{color:#9fb6d8}.scoreb{font-size:clamp(36px,9vh,60px);font-weight:800;color:#fff;text-shadow:0 0 16px var(--c)}.scoreb small{font-size:20px}
+.ovin p{color:#c8d8f0;font-size:clamp(13px,2.3vh,15px)}
+.how,.frame,.bestbox,.rkwrap{width:100%;border:1px solid var(--b);border-radius:14px;background:rgba(12,24,48,.5);padding:clamp(8px,1.8vh,14px) 14px;text-align:left;box-shadow:inset 0 0 18px rgba(55,230,255,.1)}
+.how{font-size:clamp(13px,2.4vh,17px);line-height:1.6}.how ul{padding-left:1.3em;margin-top:6px}.how li{margin:3px 0}.lead{margin-bottom:8px;color:#e8f6ff!important}
+.tb{width:100%;border-collapse:collapse;font-size:clamp(12px,2.2vh,15px);margin:6px 0}.tb th,.tb td{border:1px solid var(--b);padding:5px 7px;text-align:center}.tb th{background:rgba(55,230,255,.15);color:#9ff4ff}
+.bestbox{text-align:center;font-size:clamp(15px,2.8vh,18px)}.bestbox b{font-size:clamp(22px,4.5vh,30px);color:#ffd24a;margin:0 4px}
+.frame{position:relative;padding-top:20px}.ft{position:absolute;top:-12px;left:14px;padding:0 10px;background:#0b1630;border:1px solid var(--b);border-radius:999px;color:#9ff4ff;font-size:15px;font-weight:700}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.wide{width:100%}
+.big{width:100%;font-size:clamp(18px,3.8vh,26px);padding:.7em}.start{margin-top:auto}
+.ovin>button{width:min(320px,100%)}
+.lgbox{width:100%;max-height:calc(5*60px + 4px);overflow-y:auto;border:1px solid var(--b);border-radius:12px;background:rgba(12,24,48,.5);text-align:left}
+.lg{height:60px;padding:6px 14px;border-bottom:1px solid rgba(55,230,255,.18);display:flex;flex-direction:column;justify-content:center;gap:2px}
+.lg .n{font-size:14px;color:#9ff4ff}.lg .n .gd{color:#ffd24a;text-shadow:0 0 8px rgba(255,180,0,.8)}.mk{display:inline-block;width:1.2em;text-align:center;font-weight:900}.mk.ok{color:#59f2a0}.mk.ng{color:#ff6b8a}.lg .a{font-size:16px;color:#fff;font-weight:600}
+/* ランキング */
+.rkwrap{padding:10px}.mine{text-align:center;font-size:clamp(15px,2.8vh,19px);margin-bottom:8px;color:#fff}.mine b{color:#ffd24a;font-size:1.4em}
+.rklist{position:relative;max-height:min(30vh,300px);overflow-y:auto}
+.rk{display:grid;grid-template-columns:3.2em 1fr 4.5em 3.8em;gap:6px;padding:6px 8px;border-bottom:1px solid rgba(55,230,255,.15);font-size:clamp(13px,2.4vh,16px);align-items:center}
+.rk .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}.rk span:not(.nm){text-align:right}
+.rk.hd{color:#9ff4ff;font-size:13px;border-bottom:1px solid var(--b)}
+.rk.me{background:rgba(255,210,74,.2);color:#ffe9a0;font-weight:800;border-radius:8px;box-shadow:0 0 12px rgba(255,210,74,.5) inset}
+#cf{position:absolute;inset:0;z-index:4;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.6)}
+#cf .box{width:min(320px,88%);padding:20px;border:1px solid var(--b);border-radius:16px;background:rgba(10,20,44,.92);text-align:center;font-size:18px;line-height:1.6}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+/* 式の入力パネル */
+#ui{position:relative;padding:10px;display:none;flex-direction:column;gap:clamp(5px,1.2vh,8px);overflow-y:auto;max-height:52vh;transition:.2s}
+#ui.dis{pointer-events:none}#ui.dis>:not(#to):not(#wt){opacity:.4;filter:grayscale(.6)}
+#expr{min-height:clamp(40px,7vh,56px);border:1px solid var(--b);border-radius:12px;background:rgba(12,24,48,.55);backdrop-filter:blur(8px);font-size:clamp(20px,4.2vh,32px);font-weight:700;letter-spacing:3px;padding:6px 14px;display:flex;align-items:center;justify-content:space-between;box-shadow:inset 0 0 16px rgba(55,230,255,.12)}
+#expr small{font-size:16px;color:#ffd24a;letter-spacing:0}
+#cap{font-size:clamp(11px,2vh,13px);color:#9fb6d8;text-align:center}
+.row{display:grid;gap:8px}
+.tile{font-size:clamp(22px,5vh,36px);padding:.4em 0;border-radius:14px;text-align:center;background:rgba(55,230,255,.1);border:1px solid var(--b);font-weight:700;position:relative}
+.tile.fix{color:#cfefff;border-style:dashed;background:rgba(255,255,255,.04)}.tile.fix.u{opacity:.35}
+.tile i{position:absolute;top:2px;left:8px;font-size:11px;font-style:normal;color:#9fb6d8}
+.op{font-size:clamp(24px,5.4vh,38px);padding:.35em 0;border-radius:14px}
+.o0{border-color:#59f2a0;background:rgba(89,242,160,.14)}.o0:hover:not(:disabled){background:rgba(89,242,160,.45)!important;border-color:#bfffd9!important;box-shadow:0 0 18px rgba(89,242,160,.7)!important}
+.o1{border-color:#6aa8ff;background:rgba(106,168,255,.14)}.o1:hover:not(:disabled){background:rgba(106,168,255,.45)!important;border-color:#cfe2ff!important;box-shadow:0 0 18px rgba(106,168,255,.7)!important}
+.o2{border-color:#ffab4a;background:rgba(255,171,74,.14)}.o2:hover:not(:disabled){background:rgba(255,171,74,.45)!important;border-color:#ffe0b8!important;box-shadow:0 0 18px rgba(255,171,74,.7)!important}
+.o3{border-color:#c58bff;background:rgba(197,139,255,.14)}.o3:hover:not(:disabled){background:rgba(197,139,255,.45)!important;border-color:#ecd8ff!important;box-shadow:0 0 18px rgba(197,139,255,.7)!important}
+#ctl .go{font-size:clamp(18px,4vh,26px)}
+/* 横長の画面(PC・横向きスマホ・横長の小窓): 左に大画面、右に入力パネル。プレイ中だけ */
+@media (min-aspect-ratio:11/10) and (min-width:560px){
+ #app.play{grid-template-columns:minmax(0,1fr) clamp(260px,34vw,400px);grid-template-rows:minmax(0,1fr)}
+ #app.play #ui{max-height:none;height:100%;justify-content:center;border-left:1px solid var(--b)}
+}
+
+/* ランキングのモード選択(モード選択画面と同じ枠) */
+.frame.sm{padding:14px 10px 8px}
+button.sel{background:rgba(255,210,74,.28);border-color:rgba(255,210,74,.9);color:#ffe9a0;box-shadow:0 0 14px rgba(255,210,74,.5)}
+
+/* 問題の車がまだ前に入ってこないあいだ: 入力パネル全体を「ちょっとまってね」で覆う */
+#wt{position:absolute;inset:0;z-index:4;display:none;flex-direction:column;align-items:center;justify-content:center;gap:6px;border-radius:14px;background:rgba(8,16,36,.82);backdrop-filter:blur(4px);pointer-events:none;text-align:center}
+#wt b{font-size:clamp(22px,5vh,34px);color:#9ff4ff;text-shadow:0 0 14px rgba(55,230,255,.9);letter-spacing:2px;animation:wtp 1.4s ease-in-out infinite}
+#wt small{font-size:clamp(12px,2.2vh,15px);color:#9fb6d8}
+@keyframes wtp{50%{opacity:.45}}
+#ui.wt{pointer-events:none}
+#ui.wt #wt{display:flex}
