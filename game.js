@@ -5,7 +5,7 @@ const SHARE_URL=location.origin+location.pathname;   // ★シェアに載せる
 //  Supabaseでプロジェクトを作ったら、下の2つに「Project URL」と「anon public key」を貼ってください(手順は GUIDE.md)。
 //  空のままだと、ランキングは「この端末の中だけ」で動きます(テスト用)。
 //  書き方の例: const SB_URL='https://abcdefgh.supabase.co',SB_KEY='eyJhbGciOi...(anon public key)';
-const SB_URL='',SB_KEY='sb_publishable_MXK8sQFX_0e9oPcbkwdBLQ_yXeM6PDr';   // ★SNS版用の新しいSupabaseプロジェクトの Project URL と publishable key をここに貼る
+const SB_URL='https://noirwgctxjfgqzbuhetc.supabase.co/rest/v1/',SB_KEY='sb_publishable_MXK8sQFX_0e9oPcbkwdBLQ_yXeM6PDr';   // ★SNS版用の新しいSupabaseプロジェクトの Project URL と publishable key をここに貼る
 // ★ランキングの見せ方: true=身内用(全員の順位表が見える) / false=公開用(自分の順位だけ見える)
 const FULL_RANKING=false;   // SNS版は公開用(自分の順位だけ表示)
 // ★Xシェアボタン: 身内だけに共有したいとき(Xの投稿画面を出したくないとき)は、
